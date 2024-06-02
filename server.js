@@ -5,14 +5,13 @@ const DISCORD_WEBHOOK_URL = process.env.DISCORD_WEBHOOK_URL;
 const TOKEN = process.env.TOKEN;
 const COOKIE = process.env.COOKIE;
 
-const { default: next } = require('next');
 const images = require('./images');
 
 
 (async () => {
-    const fetch = (await import('node-fetch')).default;
+    const axios = require ('axios');
     const { Client, GatewayIntentBits, WebhookClient } = require('discord.js');
-    const { EmbedBuilder } = await import('@discordjs/builders');
+    const { EmbedBuilder } = require('@discordjs/builders');
     const fs = require('fs');
 
     const getTotalSales = (itemName, today) => {
@@ -68,18 +67,19 @@ const images = require('./images');
         let ROBLOX_API_ENDPOINT2 = `https://economy.roblox.com/v2/groups/33003599/transactions?limit=100&sortOrder=Asc&transactionType=Sale`;
         
         while (hasNextPage) {
-            console.log(ROBLOX_API_ENDPOINT2)
-            const response = await fetch(ROBLOX_API_ENDPOINT2, {
+            const response = await axios.get(ROBLOX_API_ENDPOINT2, {
                 headers: {
-                    'Cookie': COOKIE
+                  'Cookie': COOKIE
                 }
-            });
+              });
+    
+            
             if (!response.ok) {
                 console.error('Error fetching data:', response.statusText);
                 return;
             }
     
-            const data = await response.json();
+            const data = await response.data;
             if (!data || !data.data || data.data.length === 0) {
                 console.log('Empty data');
                 return;
@@ -139,12 +139,13 @@ const images = require('./images');
    
     async function fetchTransactions() {
       try {
-        const response = await fetch(ROBLOX_API_ENDPOINT, {
+        const response = await axios.get(ROBLOX_API_ENDPOINT, {
             headers: {
               'Cookie': COOKIE
             }
           });
-        const data = await response.json();
+
+        const data = await response.data;
         if (!data || !data.data || data.data.length === 0) {
           console.log('Empty data');
           return;
